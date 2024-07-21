@@ -6,29 +6,48 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 
-import CustomFormField, { FormFieldType } from "../CustomFormField";
+import { UserFormValidation } from "@/lib/validation";
 
-const formSchema = z.object({
-  username: z.string().min(2).max(50),
-});
+import SubmitButton from "../SubmitButton";
+
+import CustomFormField, { FormFieldType } from "../CustomFormField";
 
 export const PatientForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof UserFormValidation>>({
+    resolver: zodResolver(UserFormValidation),
     defaultValues: {
-      username: "",
+      name: "",
+      email: "",
+      phone: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-  }
+  const onSubmit = async (values: z.infer<typeof UserFormValidation>) => {
+    setIsLoading(true);
+
+    try {
+      const user = {
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+      };
+
+      // const newUser = await createUser(user);
+
+      // if (newUser) {
+      //   router.push(`/patients/${newUser.$id}/register`);
+      // }
+    } catch (error) {
+      console.log(error);
+    }
+
+    setIsLoading(false);
+  };
 
   return (
     <Form {...form}>
@@ -65,7 +84,7 @@ export const PatientForm = () => {
           placeholder="(555) 123-4567"
         />
 
-        <Button type="submit">Submit</Button>
+        <SubmitButton isLoading={isLoading}>Get Started</SubmitButton>
       </form>
     </Form>
   );
